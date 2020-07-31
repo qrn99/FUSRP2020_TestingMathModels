@@ -78,5 +78,5 @@ if __name__ == '__main__':
     plt.plot(t, g, label='G')
     plt.plot(t, i, label='I')
 
-plt.legend()
-plt.show()
+    plt.legend()
+    plt.show()
