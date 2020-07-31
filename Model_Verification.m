@@ -4,11 +4,11 @@ solveSystem;
 function setParam
 %Define parameters
 global G_initial;
-G_initial=90;%fasting glucose level mg/dl
+G_initial=7;%fasting glucose level mmol/L
 global I_initial;
-I_initial=80;%fasting insulin level units unknown and this is more of a guess 
+I_initial=1.7*10^(-7);%fasting insulin level units unknown and this is more of a guess mmol/L
 global S_initial;
-S_initial=75; %glucose ingested (g)
+S_initial=417; %glucose ingested (mmol)
 global J_initial;
 J_initial=0;
 global J;
@@ -22,7 +22,7 @@ k_gj=0.1;%kinetic constant for glucose absorption from J
 global k_jl;
 k_jl=0.0316;%kinetic constant for glucose deliver from J to L
 global tau;
-tau=100;%time delay constant between J to L
+tau=80;%time delay constant between J to L
 global k_xg;
 k_xg=0.01;%kinetic constant of basal uptake
 global k_xgi;
@@ -83,7 +83,7 @@ dy(2)=k_js*y(1)-k_gj*y(2)-k_jl*y(2);
 J(round(t)+1)=y(2);
 dy(3)=k_jl*delay(t,J)-k_gl*y(3);
 dy(4)=-(k_xg+k_xgi*y(5))*y(4)+Gprod(y(4))+eta*(k_gj*y(2)+k_gl*y(3));
-dy(5)=(k_xi*I_initial)*((beta^(gamma)+1)/(beta^(gamma)*(G_initial/(y(4)+f_gj*(k_gj*y(2)+k_gl*y(3))))+1)-y(5)/I_initial);
+dy(5)=(k_xi*I_initial)*((beta^(gamma)+1)/(beta^(gamma)*(G_initial/(y(4)+f_gj*(k_gj*y(2)+k_gl*y(3))))^gamma+1)-y(5)/I_initial);
 dy=dy';
 end
 function solveSystem
@@ -95,11 +95,23 @@ global J_initial
 tspan = 0:120;%120 time points, each representing a minute
 init_val=[S_initial J_initial L_initial G_initial I_initial];
 [t,y] = ode45(@myODE,tspan,init_val);
-plot(t,y(:,1),'-o',t,y(:,2),'-o',t,y(:,3),'-o',t,y(:,4),'-o',t,y(:,5),'-o')
+plot(t,y(:,1),'-o',t,y(:,2),'-o',t,y(:,3),'-o')
 title('Solution with ODE45');
 xlabel('Time t');
 ylabel('Solution y');
-legend('y(1)=S','y(2)=J', 'y(3)=L', 'y(4)=G', 'y(5)=I')
+legend('y(1)=S','y(2)=J', 'y(3)=L')
+figure;
+plot(t,y(:,4),'-o')
+title('Solution with ODE45');
+xlabel('Time t');
+ylabel('Solution G');
+legend('y(4)=G')
+figure;
+plot(t,y(:,5),'-o')
+title('Solution with ODE45');
+xlabel('Time t');
+ylabel('Solution I');
+legend('y(5)=I')
 end
 
 
